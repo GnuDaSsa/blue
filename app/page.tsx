@@ -156,10 +156,16 @@ export default function Home() {
                   if (data.progress !== undefined) {
                     setGenerationState(prev => {
                       const newSceneImages = [...(prev.sceneImages || [])];
+                      const newSceneImagesWithPrompts = [...(prev.sceneImagesWithPrompts || [])];
                       
                       // Add newly generated image if available
                       if (data.imageUrl) {
                         newSceneImages.push(data.imageUrl);
+                      }
+                      
+                      // Add scene data with prompt if available
+                      if (data.sceneData) {
+                        newSceneImagesWithPrompts.push(data.sceneData);
                       }
                       
                       return {
@@ -168,17 +174,19 @@ export default function Home() {
                         totalScenes: data.total || prev.totalScenes,
                         message: `이미지 생성 중... (${data.progress}/${data.total || sceneCount})`,
                         sceneImages: newSceneImages,
+                        sceneImagesWithPrompts: newSceneImagesWithPrompts,
                       };
                     });
                   }
 
                   // Handle completion
                   if (data.completed && data.sceneImages) {
-                    setGenerationState({
+                    setGenerationState(prev => ({
                       status: 'completed',
                       message: '뮤직비디오 생성이 완료되었습니다!',
                       sceneImages: data.sceneImages,
-                    });
+                      sceneImagesWithPrompts: prev.sceneImagesWithPrompts,
+                    }));
                   }
                 } catch (parseError) {
                   console.warn('JSON parse error (will retry with next chunk):', parseError);
@@ -250,7 +258,11 @@ export default function Home() {
         )}
 
         {generationState.status === 'completed' && generationState.sceneImages && (
-          <ImageGallery images={generationState.sceneImages} onReset={handleReset} />
+          <ImageGallery 
+            images={generationState.sceneImages} 
+            sceneImagesWithPrompts={generationState.sceneImagesWithPrompts}
+            onReset={handleReset} 
+          />
         )}
 
         {generationState.status === 'error' && (

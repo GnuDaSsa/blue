@@ -54,13 +54,19 @@ export async function POST(request: NextRequest) {
 
             sceneImages.push(imageUrl);
 
-            // Send progress update with image to client (with error handling)
+            // Send progress update with image and prompt to client (with error handling)
             try {
               const progressData = {
                 progress: i + 1,
                 total: totalScenes,
                 imageUrl: imageUrl, // Send the newly generated image
                 sceneNumber: i + 1,
+                sceneData: {
+                  url: imageUrl,
+                  prompt: scenePrompts[i].prompt,
+                  description: scenePrompts[i].description,
+                  scene_number: scenePrompts[i].scene_number,
+                },
               };
               controller.enqueue(
                 encoder.encode(`data: ${JSON.stringify(progressData)}\n\n`)
