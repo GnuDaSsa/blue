@@ -12,15 +12,65 @@ interface ProtagonistSelectorProps {
 
 export default function ProtagonistSelector({ images, onSelect, onBack }: ProtagonistSelectorProps) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [uploadedImage, setUploadedImage] = useState<{ id: string; url: string } | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
 
   const handleSelect = (image: ProtagonistImage) => {
     setSelectedId(image.id);
   };
 
   const handleConfirm = () => {
-    const selected = images.find(img => img.id === selectedId);
+    let selected;
+    if (uploadedImage && selectedId === uploadedImage.id) {
+      selected = uploadedImage;
+    } else {
+      selected = images.find(img => img.id === selectedId);
+    }
     if (selected) {
       onSelect(selected);
+    }
+  };
+
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      alert('이미지 파일만 업로드 가능합니다.');
+      return;
+    }
+
+    // Validate file size (max 10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      alert('파일 크기는 10MB 이하여야 합니다.');
+      return;
+    }
+
+    setIsUploading(true);
+
+    try {
+      // Convert to base64
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const base64 = e.target?.result as string;
+        const uploadedImg = {
+          id: 'uploaded-custom',
+          url: base64,
+        };
+        setUploadedImage(uploadedImg);
+        setSelectedId(uploadedImg.id);
+        setIsUploading(false);
+      };
+      reader.onerror = () => {
+        alert('이미지 업로드에 실패했습니다.');
+        setIsUploading(false);
+      };
+      reader.readAsDataURL(file);
+    } catch (error) {
+      console.error('Image upload error:', error);
+      alert('이미지 업로드에 실패했습니다.');
+      setIsUploading(false);
     }
   };
 
@@ -30,11 +80,61 @@ export default function ProtagonistSelector({ images, onSelect, onBack }: Protag
         <h2 className="text-4xl font-bold mb-4 text-center neon-text">
           주인공 선택
         </h2>
-        <p className="text-center text-gray-400 mb-10">
+        <p className="text-center text-gray-400 mb-4">
           뮤직비디오의 주인공이 될 이미지를 선택해주세요
         </p>
+        <p className="text-center text-purple-400 mb-10 text-sm">
+          💡 마음에 드는 이미지가 없다면 직접 업로드하세요!
+        </p>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-10">
+          {/* Upload Custom Image Card */}
+          <div className="relative aspect-square rounded-xl overflow-hidden border-2 border-dashed border-purple-500/50 hover:border-purple-400 transition-all cursor-pointer bg-black/20">
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImageUpload}
+              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+              disabled={isUploading}
+            />
+            <div className="absolute inset-0 flex flex-col items-center justify-center p-4">
+              {isUploading ? (
+                <div className="animate-spin rounded-full h-12 w-12 border-4 border-purple-500 border-t-transparent"></div>
+              ) : uploadedImage ? (
+                <>
+                  <Image
+                    src={uploadedImage.url}
+                    alt="Uploaded protagonist"
+                    fill
+                    className="object-cover"
+                  />
+                  {selectedId === uploadedImage.id && (
+                    <div className="absolute inset-0 bg-purple-500/20 flex items-center justify-center">
+                      <div className="bg-purple-600 rounded-full p-3">
+                        <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <>
+                  <svg className="w-16 h-16 text-purple-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                  </svg>
+                  <p className="text-purple-400 font-semibold text-center">
+                    이미지 업로드
+                  </p>
+                  <p className="text-gray-500 text-xs text-center mt-2">
+                    클릭하여 선택
+                  </p>
+                </>
+              )}
+            </div>
+          </div>
+
+          {/* AI Generated Images */}
           {images.map((image) => (
             <div
               key={image.id}

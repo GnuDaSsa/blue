@@ -4,7 +4,7 @@ import { sessionStore } from '@/utils/sessionStore';
 
 export async function POST(request: NextRequest) {
   try {
-    const { lyrics } = await request.json();
+    const { lyrics, sceneCount = 20 } = await request.json();
 
     if (!lyrics || typeof lyrics !== 'string') {
       return NextResponse.json(
@@ -13,9 +13,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Validate scene count
+    const validSceneCounts = [8, 12, 20, 25, 32];
+    if (!validSceneCounts.includes(sceneCount)) {
+      return NextResponse.json(
+        { error: 'Invalid scene count. Must be 8, 12, 20, 25, or 32' },
+        { status: 400 }
+      );
+    }
+
     // Step 1: Generate storyboard using LLM
-    console.log('Generating storyboard with LLM...');
-    const storyboard = await generateStoryboard(lyrics);
+    console.log(`Generating storyboard with LLM... (${sceneCount} scenes)`);
+    const storyboard = await generateStoryboard(lyrics, sceneCount);
 
     // Create session ID and store data
     const sessionId = Date.now().toString();

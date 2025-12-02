@@ -3,17 +3,20 @@
 import { useState } from 'react';
 
 interface LyricsInputProps {
-  onGenerate: (lyrics: string) => void;
+  onGenerate: (lyrics: string, sceneCount: number) => void;
 }
 
 export default function LyricsInput({ onGenerate }: LyricsInputProps) {
   const [lyrics, setLyrics] = useState('');
+  const [sceneCount, setSceneCount] = useState(20);
 
   const handleSubmit = () => {
     if (lyrics.trim()) {
-      onGenerate(lyrics);
+      onGenerate(lyrics, sceneCount);
     }
   };
+
+  const sceneCounts = [8, 12, 20, 25, 32];
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -26,8 +29,33 @@ export default function LyricsInput({ onGenerate }: LyricsInputProps) {
           value={lyrics}
           onChange={(e) => setLyrics(e.target.value)}
           placeholder="여기에 가사를 입력하세요...&#10;&#10;예시:&#10;[Verse 1]&#10;Walking down the empty street&#10;Memories flowing at my feet..."
-          className="w-full h-96 bg-black/30 border border-purple-500/30 rounded-xl p-6 text-gray-200 placeholder-gray-500 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50 resize-none text-lg"
+          className="w-full h-80 bg-black/30 border border-purple-500/30 rounded-xl p-6 text-gray-200 placeholder-gray-500 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50 resize-none text-lg"
         />
+
+        {/* Scene Count Selection */}
+        <div className="mt-6">
+          <label className="block text-center text-gray-400 mb-3 font-semibold">
+            🎬 생성할 씬 개수 선택
+          </label>
+          <div className="flex justify-center gap-3 flex-wrap">
+            {sceneCounts.map((count) => (
+              <button
+                key={count}
+                onClick={() => setSceneCount(count)}
+                className={`px-6 py-3 rounded-lg font-bold transition-all ${
+                  sceneCount === count
+                    ? 'bg-purple-600 text-white ring-2 ring-purple-400 scale-105'
+                    : 'bg-black/30 text-gray-400 border border-purple-500/30 hover:border-purple-500 hover:text-purple-400'
+                }`}
+              >
+                {count}개
+              </button>
+            ))}
+          </div>
+          <p className="text-center text-gray-500 text-sm mt-2">
+            * 씬이 많을수록 생성 시간이 길어집니다 (약 {Math.ceil(sceneCount * 2 / 60)}분 소요)
+          </p>
+        </div>
 
         <div className="mt-8 flex justify-center">
           <button

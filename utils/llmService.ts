@@ -3,19 +3,19 @@ import type { LLMResponse } from '@/types';
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';
 
-export async function generateStoryboard(lyrics: string): Promise<LLMResponse> {
+export async function generateStoryboard(lyrics: string, sceneCount: number = 30): Promise<LLMResponse> {
   if (!GEMINI_API_KEY) {
     throw new Error('GEMINI_API_KEY is not configured');
   }
 
   const prompt = `
-You are a professional music video director and storyboard artist. Analyze the following song lyrics and create a detailed storyboard for a cinematic music video with 30 scenes.
+You are a professional music video director and storyboard artist. Analyze the following song lyrics and create a detailed storyboard for a cinematic music video with ${sceneCount} scenes.
 
 LYRICS:
 ${lyrics}
 
 CRITICAL REQUIREMENTS FOR PROTAGONIST:
-1. Style: Professional 2D illustration (anime/webtoon/character design quality)
+1. Style: Professional 2D illustration (anime/webtoon/character design quality) - NO CARTOON style
 2. Background: Pure white background (#FFFFFF)
 3. Details: Include specific details about:
    - Facial features (eye color, shape, expression)
@@ -46,7 +46,8 @@ Please return a JSON object with the following structure:
 IMPORTANT INSTRUCTIONS:
 - Protagonist prompt MUST be EXTREMELY DETAILED (minimum 100 words) with specific physical features
 - Include unique identifying features that make the character memorable and consistent
-- Create exactly 30 scenes distributed evenly across the song duration
+- NEVER use cartoon style - use anime, webtoon, or realistic illustration style only
+- Create exactly ${sceneCount} scenes distributed evenly across the song duration
 - Each scene prompt should be highly detailed (minimum 50 words per scene)
 - Scene prompts should include:
   * Protagonist's exact pose, action, facial expression
@@ -75,11 +76,35 @@ Generate a highly detailed, professional storyboard now:`;
           }]
         }],
         generationConfig: {
-          temperature: 0.7,
-          topK: 40,
-          topP: 0.95,
+          temperature: 0.5,
+          topK: 20,
+          topP: 0.9,
           maxOutputTokens: 8192,
           responseMimeType: "application/json",
+          responseSchema: {
+            type: "object",
+            properties: {
+              protagonist_prompt: {
+                type: "string"
+              },
+              scene_prompts: {
+                type: "array",
+                items: {
+                  type: "object",
+                  properties: {
+                    scene_number: { type: "integer" },
+                    timestamp: { type: "string" },
+                    description: { type: "string" },
+                    camera_angle: { type: "string" },
+                    lighting: { type: "string" },
+                    prompt: { type: "string" }
+                  },
+                  required: ["scene_number", "timestamp", "description", "camera_angle", "lighting", "prompt"]
+                }
+              }
+            },
+            required: ["protagonist_prompt", "scene_prompts"]
+          }
         }
       }),
     });
@@ -120,8 +145,9 @@ Generate a highly detailed, professional storyboard now:`;
       throw new Error('Invalid response structure from LLM');
     }
 
-    if (parsedResponse.scene_prompts.length !== 30) {
-      throw new Error(`Expected 30 scenes, got ${parsedResponse.scene_prompts.length}`);
+    if (parsedResponse.scene_prompts.length !== sceneCount) {
+      console.warn(`Expected ${sceneCount} scenes, got ${parsedResponse.scene_prompts.length}`);
+      // Allow slight variations in scene count
     }
 
     return parsedResponse;

@@ -15,7 +15,10 @@ export default function Home() {
   });
   const [sessionId, setSessionId] = useState<string | null>(null);
 
-  const handleGenerateStart = async (lyrics: string) => {
+  const [sceneCount, setSceneCount] = useState(20);
+
+  const handleGenerateStart = async (lyrics: string, selectedSceneCount: number) => {
+    setSceneCount(selectedSceneCount);
     setGenerationState({
       status: 'generating_story',
       message: 'AI가 가사를 분석하고 스토리보드를 생성하고 있습니다...',
@@ -25,7 +28,7 @@ export default function Home() {
       const response = await fetch('/api/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ lyrics }),
+        body: JSON.stringify({ lyrics, sceneCount: selectedSceneCount }),
       });
 
       if (!response.ok) {
