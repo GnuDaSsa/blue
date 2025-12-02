@@ -114,44 +114,76 @@ export default function Home() {
 
       const reader = response.body?.getReader();
       const decoder = new TextDecoder();
+      let buffer = ''; // Buffer for incomplete SSE messages
 
       if (reader) {
         while (true) {
           const { done, value } = await reader.read();
           if (done) break;
 
-          const chunk = decoder.decode(value);
-          const lines = chunk.split('\n');
+          // Append new chunk to buffer
+          buffer += decoder.decode(value, { stream: true });
+          
+          // Split by double newlines (SSE message delimiter)
+          const messages = buffer.split('\n\n');
+          
+          // Keep the last incomplete message in buffer
+          buffer = messages.pop() || '';
 
-          for (const line of lines) {
-            if (line.startsWith('data: ')) {
-              const data = JSON.parse(line.slice(6));
-              
-              if (data.progress !== undefined) {
-                setGenerationState(prev => {
-                  const newSceneImages = [...(prev.sceneImages || [])];
+          for (const message of messages) {
+            const lines = message.split('\n');
+            
+            for (const line of lines) {
+              if (line.startsWith('data: ')) {
+                try {
+                  const jsonStr = line.slice(6).trim();
+                  if (!jsonStr) continue; // Skip empty data
                   
-                  // Add newly generated image if available
-                  if (data.imageUrl) {
-                    newSceneImages.push(data.imageUrl);
+                  const data = JSON.parse(jsonStr);
+                  
+                  // Handle error from server
+                  if (data.error) {
+                    console.error('Server error:', data.error, data.details);
+                    setGenerationState({
+                      status: 'error',
+                      message: data.error,
+                      error: data.details || '서버에서 오류가 발생했습니다.',
+                    });
+                    return;
                   }
                   
-                  return {
-                    ...prev,
-                    progress: data.progress,
-                    totalScenes: data.total || prev.totalScenes,
-                    message: `이미지 생성 중... (${data.progress}/${data.total || sceneCount})`,
-                    sceneImages: newSceneImages,
-                  };
-                });
-              }
+                  // Handle progress update
+                  if (data.progress !== undefined) {
+                    setGenerationState(prev => {
+                      const newSceneImages = [...(prev.sceneImages || [])];
+                      
+                      // Add newly generated image if available
+                      if (data.imageUrl) {
+                        newSceneImages.push(data.imageUrl);
+                      }
+                      
+                      return {
+                        ...prev,
+                        progress: data.progress,
+                        totalScenes: data.total || prev.totalScenes,
+                        message: `이미지 생성 중... (${data.progress}/${data.total || sceneCount})`,
+                        sceneImages: newSceneImages,
+                      };
+                    });
+                  }
 
-              if (data.completed && data.sceneImages) {
-                setGenerationState({
-                  status: 'completed',
-                  message: '뮤직비디오 생성이 완료되었습니다!',
-                  sceneImages: data.sceneImages,
-                });
+                  // Handle completion
+                  if (data.completed && data.sceneImages) {
+                    setGenerationState({
+                      status: 'completed',
+                      message: '뮤직비디오 생성이 완료되었습니다!',
+                      sceneImages: data.sceneImages,
+                    });
+                  }
+                } catch (parseError) {
+                  console.warn('JSON parse error (will retry with next chunk):', parseError);
+                  // Don't throw - just log and continue, the buffer will accumulate
+                }
               }
             }
           }
