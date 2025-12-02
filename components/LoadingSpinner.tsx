@@ -7,9 +7,11 @@ interface LoadingSpinnerProps {
   progress?: number;
   totalScenes?: number;
   sceneImages?: string[];
+  onCancel?: () => void;
+  showCancel?: boolean;
 }
 
-export default function LoadingSpinner({ message, progress, totalScenes, sceneImages }: LoadingSpinnerProps) {
+export default function LoadingSpinner({ message, progress, totalScenes, sceneImages, onCancel, showCancel }: LoadingSpinnerProps) {
   return (
     <div className="max-w-2xl mx-auto">
       <div className="glass-morphism rounded-2xl p-12 shadow-2xl text-center">
@@ -75,6 +77,21 @@ export default function LoadingSpinner({ message, progress, totalScenes, sceneIm
         <p className="text-gray-500 mt-6 text-sm">
           잠시만 기다려주세요... ☕
         </p>
+
+        {/* Cancel Button */}
+        {showCancel && onCancel && progress !== undefined && totalScenes && progress < totalScenes && (
+          <div className="mt-6">
+            <button
+              onClick={onCancel}
+              className="px-8 py-3 rounded-lg font-semibold text-white bg-red-600 hover:bg-red-700 transition-all"
+            >
+              ❌ 생성 취소
+            </button>
+            <p className="text-gray-500 text-xs mt-2">
+              * 이미 생성된 이미지는 유지됩니다
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );

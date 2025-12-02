@@ -9,15 +9,7 @@ export async function POST(request: NextRequest) {
   const stream = new ReadableStream({
     async start(controller) {
       try {
-        const { protagonistImageUrl, sessionId } = await request.json();
-
-        if (!protagonistImageUrl) {
-          controller.enqueue(
-            encoder.encode(`data: ${JSON.stringify({ error: 'No protagonist image provided' })}\n\n`)
-          );
-          controller.close();
-          return;
-        }
+        const { protagonistImageUrl, noProtagonist, sessionId } = await request.json();
 
         // Retrieve storyboard from session (if sessionId provided)
         let scenePrompts;
@@ -48,8 +40,8 @@ export async function POST(request: NextRequest) {
             
             const imageUrl = await generateImage({
               prompt: scenePrompts[i].prompt,
-              referenceImageUrl: protagonistImageUrl,
-              useCharacterConsistency: true,
+              referenceImageUrl: noProtagonist ? undefined : protagonistImageUrl,
+              useCharacterConsistency: !noProtagonist,
             });
 
             sceneImages.push(imageUrl);

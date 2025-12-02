@@ -141,13 +141,25 @@ export default function Home() {
     }
   };
 
-  const handleProtagonistSelect = async (selectedImage: ProtagonistImage) => {
+  const handleCancelGeneration = () => {
+    setGenerationState(prev => ({
+      ...prev,
+      cancelGeneration: true,
+    }));
+  };
+
+  const handleProtagonistSelect = async (selectedImage: ProtagonistImage | null) => {
+    const noProtagonist = selectedImage === null;
+    
     setGenerationState({
       status: 'generating_scenes',
-      message: `${sceneCount}컷의 뮤직비디오 이미지를 생성하고 있습니다...`,
+      message: noProtagonist 
+        ? `${sceneCount}컷의 뮤직비디오 이미지를 생성하고 있습니다... (씬마다 다른 캐릭터)`
+        : `${sceneCount}컷의 뮤직비디오 이미지를 생성하고 있습니다...`,
       progress: 0,
       totalScenes: sceneCount,
       sceneImages: [],
+      cancelGeneration: false,
     });
 
     try {
@@ -155,7 +167,8 @@ export default function Home() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
-          protagonistImageUrl: selectedImage.url,
+          protagonistImageUrl: selectedImage?.url || null,
+          noProtagonist: noProtagonist,
           sessionId: sessionId
         }),
       });
@@ -170,6 +183,18 @@ export default function Home() {
 
       if (reader) {
         while (true) {
+          // Check if user cancelled
+          if (generationState.cancelGeneration) {
+            reader.cancel();
+            setGenerationState(prev => ({
+              status: 'completed',
+              message: '생성이 취소되었습니다',
+              sceneImages: prev.sceneImages || [],
+              sceneImagesWithPrompts: prev.sceneImagesWithPrompts || [],
+            }));
+            return;
+          }
+
           const { done, value } = await reader.read();
           if (done) break;
 
@@ -289,6 +314,8 @@ export default function Home() {
             progress={generationState.progress}
             totalScenes={generationState.totalScenes}
             sceneImages={generationState.sceneImages}
+            onCancel={handleCancelGeneration}
+            showCancel={generationState.status === 'generating_scenes'}
           />
         )}
 

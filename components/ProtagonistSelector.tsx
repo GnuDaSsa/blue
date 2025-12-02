@@ -6,7 +6,7 @@ import type { ProtagonistImage } from '@/types';
 
 interface ProtagonistSelectorProps {
   images: ProtagonistImage[];
-  onSelect: (image: ProtagonistImage) => void;
+  onSelect: (image: ProtagonistImage | null) => void; // null = no protagonist
   onBack: () => void;
 }
 
@@ -20,6 +20,12 @@ export default function ProtagonistSelector({ images, onSelect, onBack }: Protag
   };
 
   const handleConfirm = () => {
+    if (selectedId === 'no-protagonist') {
+      // No protagonist selected - AI will generate varied characters per scene
+      onSelect(null);
+      return;
+    }
+    
     let selected;
     if (uploadedImage && selectedId === uploadedImage.id) {
       selected = uploadedImage;
@@ -83,11 +89,48 @@ export default function ProtagonistSelector({ images, onSelect, onBack }: Protag
         <p className="text-center text-gray-400 mb-4">
           뮤직비디오의 주인공이 될 이미지를 선택해주세요
         </p>
-        <p className="text-center text-purple-400 mb-10 text-sm">
+        <p className="text-center text-purple-400 mb-2 text-sm">
           💡 마음에 드는 이미지가 없다면 직접 업로드하세요!
         </p>
+        <p className="text-center text-pink-400 mb-10 text-sm">
+          ✨ 또는 '주인공 없음'을 선택하면 씬마다 다양한 캐릭터가 자동 생성됩니다
+        </p>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6 mb-10">
+          {/* No Protagonist Option */}
+          <div
+            onClick={() => setSelectedId('no-protagonist')}
+            className={`
+              relative aspect-square rounded-xl overflow-hidden cursor-pointer
+              transition-all duration-300 bg-gradient-to-br from-pink-900/30 to-purple-900/30
+              ${selectedId === 'no-protagonist'
+                ? 'ring-4 ring-pink-500 scale-105' 
+                : 'ring-2 ring-gray-700 hover:ring-pink-400'
+              }
+            `}
+          >
+            <div className="absolute inset-0 flex flex-col items-center justify-center p-4">
+              <svg className="w-16 h-16 text-pink-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
+              <p className="text-pink-400 font-bold text-center text-sm">
+                주인공 없음
+              </p>
+              <p className="text-gray-400 text-xs text-center mt-2">
+                씬마다 다른 캐릭터
+              </p>
+            </div>
+            {selectedId === 'no-protagonist' && (
+              <div className="absolute inset-0 bg-pink-500/20 flex items-center justify-center">
+                <div className="bg-pink-600 rounded-full p-3">
+                  <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                  </svg>
+                </div>
+              </div>
+            )}
+          </div>
+
           {/* Upload Custom Image Card */}
           <div className="relative aspect-square rounded-xl overflow-hidden border-2 border-dashed border-purple-500/50 hover:border-purple-400 transition-all cursor-pointer bg-black/20">
             <input
