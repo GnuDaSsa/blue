@@ -14,7 +14,10 @@ export async function POST(request: NextRequest) {
     }
 
     // Retrieve storyboard from session
+    console.log('Looking for session:', sessionId);
+    
     if (!sessionStore.has(sessionId)) {
+      console.error('Session not found:', sessionId);
       return NextResponse.json(
         { error: 'Session not found or expired' },
         { status: 404 }
@@ -33,7 +36,8 @@ export async function POST(request: NextRequest) {
 
     // Generate 4 protagonist candidate images
     console.log('Generating protagonist images...');
-    console.log('Protagonist prompt:', storyboard.protagonist_prompt);
+    console.log('Session data:', sessionData);
+    console.log('Protagonist prompt:', storyboard.protagonist_prompt.substring(0, 200));
     
     const protagonistImageUrls = await generateProtagonistImages(
       storyboard.protagonist_prompt
