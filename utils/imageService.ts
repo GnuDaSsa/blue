@@ -19,8 +19,17 @@ export async function generateImage(options: ImageGenerationOptions): Promise<st
 
   const { prompt, referenceImageUrl, useCharacterConsistency, aspectRatio = '1:1' } = options;
 
+  // Add aspect ratio instruction to prompt since Gemini API doesn't support it natively
+  const aspectRatioInstructions: { [key: string]: string } = {
+    '16:9': 'Create a WIDE HORIZONTAL composition (16:9 aspect ratio, landscape orientation). Frame the scene with cinematic widescreen proportions.',
+    '9:16': 'Create a TALL VERTICAL composition (9:16 aspect ratio, portrait orientation). Frame the scene with vertical smartphone/social media proportions.',
+    '1:1': 'Create a SQUARE composition (1:1 aspect ratio). Center the subject with balanced framing.'
+  };
+
+  const enhancedPrompt = `${prompt} ${aspectRatioInstructions[aspectRatio]}`;
+
   // Build request body for Gemini image generation
-  const parts: any[] = [{ text: prompt }];
+  const parts: any[] = [{ text: enhancedPrompt }];
 
   // If reference image is provided, include it for character consistency
   if (referenceImageUrl && useCharacterConsistency) {
@@ -44,13 +53,9 @@ export async function generateImage(options: ImageGenerationOptions): Promise<st
     }
   }
 
-  // Map aspect ratio to Gemini's format
-  const aspectRatioConfig: { [key: string]: string } = {
-    '16:9': '16:9',
-    '9:16': '9:16',
-    '1:1': '1:1'
-  };
-
+  // Gemini Image API uses aspectRatio directly in generationConfig
+  // Note: aspectRatio might not be supported in current Gemini Image API
+  // Images may be generated in default square format
   const requestBody = {
     contents: [{
       parts: parts
@@ -60,9 +65,7 @@ export async function generateImage(options: ImageGenerationOptions): Promise<st
       topK: 40,
       topP: 0.95,
       responseModalities: ['image'],
-      outputOptions: {
-        aspectRatio: aspectRatioConfig[aspectRatio]
-      }
+      // aspectRatio: aspectRatio, // Currently not supported by Gemini Image API
     }
   };
 
