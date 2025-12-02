@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import LyricsInput from '@/components/LyricsInput';
+import StoryboardReview from '@/components/StoryboardReview';
 import ProtagonistSelector from '@/components/ProtagonistSelector';
 import ImageGallery from '@/components/ImageGallery';
 import LoadingSpinner from '@/components/LoadingSpinner';
@@ -34,11 +35,48 @@ export default function Home() {
       const data = await response.json();
 
       setSessionId(data.sessionId);
+      
+      // Show storyboard review first
       setGenerationState({
+        status: 'storyboard_review',
+        message: '스토리보드를 검토해주세요',
+        storyboard: data.storyboard,
+      });
+    } catch (error) {
+      setGenerationState({
+        status: 'error',
+        message: '오류가 발생했습니다. 다시 시도해주세요.',
+        error: error instanceof Error ? error.message : '알 수 없는 오류',
+      });
+    }
+  };
+
+  const handleStoryboardConfirm = async () => {
+    setGenerationState(prev => ({
+      ...prev,
+      status: 'generating_story',
+      message: '주인공 후보 4개를 생성하고 있습니다... (약 10초 소요)',
+    }));
+
+    try {
+      const response = await fetch('/api/generate-protagonist', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sessionId }),
+      });
+
+      if (!response.ok) {
+        throw new Error('주인공 생성에 실패했습니다.');
+      }
+
+      const data = await response.json();
+
+      setGenerationState(prev => ({
+        ...prev,
         status: 'protagonist_selection',
         message: '주인공 이미지를 선택해주세요',
         protagonistImages: data.protagonistImages,
-      });
+      }));
     } catch (error) {
       setGenerationState({
         status: 'error',
@@ -139,6 +177,14 @@ export default function Home() {
           <LoadingSpinner 
             message={generationState.message} 
             progress={generationState.progress}
+          />
+        )}
+
+        {generationState.status === 'storyboard_review' && generationState.storyboard && (
+          <StoryboardReview
+            storyboard={generationState.storyboard}
+            onConfirm={handleStoryboardConfirm}
+            onBack={handleReset}
           />
         )}
 

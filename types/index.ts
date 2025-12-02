@@ -18,8 +18,9 @@ export interface ProtagonistImage {
 }
 
 export interface GenerationState {
-  status: 'idle' | 'generating_story' | 'protagonist_selection' | 'generating_scenes' | 'completed' | 'error';
+  status: 'idle' | 'generating_story' | 'storyboard_review' | 'protagonist_selection' | 'generating_scenes' | 'completed' | 'error';
   message: string;
+  storyboard?: LLMResponse;
   protagonistImages?: ProtagonistImage[];
   sceneImages?: string[];
   progress?: number;

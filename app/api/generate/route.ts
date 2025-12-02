@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { generateStoryboard } from '@/utils/llmService';
-import { generateProtagonistImages } from '@/utils/imageService';
 import { sessionStore } from '@/utils/sessionStore';
 
 export async function POST(request: NextRequest) {
@@ -18,12 +17,6 @@ export async function POST(request: NextRequest) {
     console.log('Generating storyboard with LLM...');
     const storyboard = await generateStoryboard(lyrics);
 
-    // Step 2: Generate 4 protagonist candidate images
-    console.log('Generating protagonist images...');
-    const protagonistImageUrls = await generateProtagonistImages(
-      storyboard.protagonist_prompt
-    );
-
     // Create session ID and store data
     const sessionId = Date.now().toString();
     sessionStore.set(sessionId, {
@@ -31,15 +24,10 @@ export async function POST(request: NextRequest) {
       timestamp: Date.now(),
     });
 
-    // Return protagonist images to frontend
-    const protagonistImages = protagonistImageUrls.map((url, index) => ({
-      id: `protagonist-${index}`,
-      url,
-    }));
-
+    // Return storyboard for review (protagonist generation will be separate)
     return NextResponse.json({
       sessionId,
-      protagonistImages,
+      storyboard,
     });
 
   } catch (error) {

@@ -15,14 +15,21 @@ LYRICS:
 ${lyrics}
 
 CRITICAL REQUIREMENTS FOR PROTAGONIST:
-1. Style: Must be 2D illustration style (anime/cartoon/artistic style)
-2. Background: Must have clean white background (background: white)
-3. Character design: Create a consistent, memorable protagonist design
-4. Format: Full body or upper body portrait suitable for character reference
+1. Style: Professional 2D illustration (anime/webtoon/character design quality)
+2. Background: Pure white background (#FFFFFF)
+3. Details: Include specific details about:
+   - Facial features (eye color, shape, expression)
+   - Hair style, color, and texture
+   - Clothing style, colors, patterns, accessories
+   - Body type, posture, and pose
+   - Age and personality traits
+   - Unique identifying features
+4. Quality: High-resolution, clean lines, professional character sheet quality
+5. Format: Full body or upper body portrait, front-facing or 3/4 view
 
 Please return a JSON object with the following structure:
 {
-  "protagonist_prompt": "A detailed prompt for generating the main character in 2D illustration style with white background. Include: character appearance, clothing, expression, pose. MUST include: '2D illustration style, white background, clean design'",
+  "protagonist_prompt": "EXTREMELY DETAILED character prompt. Must include: specific facial features (eye shape, eye color, nose, mouth), detailed hair description (style, length, color, texture), complete clothing description (type, color, patterns, accessories, shoes), body type, age range, personality visible in pose/expression, artistic style (professional 2D illustration, anime style, clean lines), pure white background. Make this as detailed as possible for consistent character generation.",
   "scene_prompts": [
     {
       "scene_number": 1,
@@ -30,25 +37,30 @@ Please return a JSON object with the following structure:
       "description": "Scene description matching the lyrics",
       "camera_angle": "Camera angle (wide shot, close-up, etc.)",
       "lighting": "Lighting description (dramatic, soft, neon, etc.)",
-      "prompt": "Complete image generation prompt including: protagonist action, environment, mood, camera angle, lighting, cinematic quality. Make it cinematic and visually stunning."
+      "prompt": "DETAILED scene description including: protagonist's specific action and emotion, detailed environment description (location, background elements, atmospheric details), mood and feeling, specific camera angle and framing, lighting direction and quality (golden hour, dramatic shadows, neon glow, etc.), color palette, cinematic composition, visual style (cinematic photography, movie scene quality), ultra detailed, high quality, professional composition."
     },
     ... (30 scenes total)
   ]
 }
 
-IMPORTANT:
-- Create exactly 30 scenes distributed evenly across the song
-- Each scene should be visually distinct and cinematic
-- Protagonist prompt MUST specify: "2D illustration style, white background"
-- Scene prompts should maintain character consistency but vary in action, location, and mood
-- Include diverse camera angles (wide shot, close-up, medium shot, aerial view, etc.)
-- Include varied lighting (dramatic, soft, neon, golden hour, etc.)
+IMPORTANT INSTRUCTIONS:
+- Protagonist prompt MUST be EXTREMELY DETAILED (minimum 100 words) with specific physical features
+- Include unique identifying features that make the character memorable and consistent
+- Create exactly 30 scenes distributed evenly across the song duration
+- Each scene prompt should be highly detailed (minimum 50 words per scene)
+- Scene prompts should include:
+  * Protagonist's exact pose, action, facial expression
+  * Detailed environment description
+  * Specific lighting setup (direction, color temperature, intensity)
+  * Camera angle and shot type (extreme close-up, close-up, medium, wide, extreme wide, aerial)
+  * Color palette and mood
+  * Cinematic references or visual style
 - Make scenes emotionally resonant with the lyrics
+- Vary locations, times of day, weather, and atmosphere across scenes
 - Return ONLY valid JSON, no markdown formatting, no code blocks
-- Ensure all JSON strings are properly escaped
-- Use double quotes for all JSON strings
+- Ensure all JSON strings are properly escaped and use double quotes
 
-Return the JSON response now:`;
+Generate a highly detailed, professional storyboard now:`;
 
   try {
     const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {

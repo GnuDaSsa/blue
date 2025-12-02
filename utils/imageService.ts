@@ -96,16 +96,21 @@ export async function generateProtagonistImages(protagonistPrompt: string): Prom
   
   // Generate 4 protagonist candidate images with slight variations
   const variations = [
-    'front view, centered composition',
-    'slight angle view, dynamic pose',
-    'confident pose, heroic stance',
-    'expressive face, detailed features'
+    'front view, centered composition, standing straight, neutral expression, professional character sheet style',
+    '3/4 angle view, slight smile, confident posture, detailed facial features',
+    'side profile view, clean silhouette, distinctive features visible, character design reference',
+    'dynamic pose, expressive face, personality showing, detailed clothing and accessories'
   ];
+  
+  const qualityEnhancement = 'masterpiece, best quality, ultra detailed, sharp focus, clean lines, professional 2D illustration, anime art style, character concept art, vibrant colors, high resolution, detailed shading, perfect anatomy';
   
   for (let i = 0; i < 4; i++) {
     try {
       // Add variation to each generation while maintaining core character
-      const variedPrompt = `${protagonistPrompt}. ${variations[i]}. High quality, detailed illustration.`;
+      const variedPrompt = `${protagonistPrompt}. ${variations[i]}. ${qualityEnhancement}. Pure white background.`;
+      
+      console.log(`Generating protagonist candidate ${i + 1}/4 with detailed prompt`);
+      
       const imageUrl = await generateImage({
         prompt: variedPrompt,
         useCharacterConsistency: false,
@@ -131,13 +136,18 @@ export async function generateSceneImages(
   onProgress?: (progress: number) => void
 ): Promise<string[]> {
   const sceneImages: string[] = [];
+  
+  const qualityEnhancement = 'cinematic composition, movie scene quality, dramatic lighting, ultra detailed, high resolution, professional photography, vibrant colors, depth of field, atmospheric, 4K quality';
 
   for (let i = 0; i < scenePrompts.length; i++) {
     try {
       console.log(`Generating scene ${i + 1}/${scenePrompts.length}...`);
       
+      // Enhance scene prompt with quality keywords
+      const enhancedPrompt = `${scenePrompts[i].prompt}. ${qualityEnhancement}. Maintain exact character appearance from reference.`;
+      
       const imageUrl = await generateImage({
-        prompt: scenePrompts[i].prompt,
+        prompt: enhancedPrompt,
         referenceImageUrl: protagonistImageUrl,
         useCharacterConsistency: true,
       });
