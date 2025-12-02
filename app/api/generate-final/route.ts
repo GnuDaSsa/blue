@@ -54,43 +54,56 @@ export async function POST(request: NextRequest) {
 
             sceneImages.push(imageUrl);
 
-            // Send progress update with image to client
-            const progressData = {
-              progress: i + 1,
-              total: totalScenes,
-              imageUrl: imageUrl, // Send the newly generated image
-              sceneNumber: i + 1,
-            };
-            controller.enqueue(
-              encoder.encode(`data: ${JSON.stringify(progressData)}\n\n`)
-            );
+            // Send progress update with image to client (with error handling)
+            try {
+              const progressData = {
+                progress: i + 1,
+                total: totalScenes,
+                imageUrl: imageUrl, // Send the newly generated image
+                sceneNumber: i + 1,
+              };
+              controller.enqueue(
+                encoder.encode(`data: ${JSON.stringify(progressData)}\n\n`)
+              );
+            } catch (enqueueError) {
+              console.warn(`Client disconnected at scene ${i + 1}, continuing generation...`);
+              // Continue generating even if client disconnected
+            }
 
             // Small delay to avoid rate limiting
             await new Promise(resolve => setTimeout(resolve, 1000));
 
           } catch (error) {
             console.error(`Error generating scene ${i + 1}:`, error);
-            controller.enqueue(
-              encoder.encode(`data: ${JSON.stringify({ 
-                error: `Failed at scene ${i + 1}`,
-                details: error instanceof Error ? error.message : 'Unknown error'
-              })}\n\n`)
-            );
+            try {
+              controller.enqueue(
+                encoder.encode(`data: ${JSON.stringify({ 
+                  error: `Failed at scene ${i + 1}`,
+                  details: error instanceof Error ? error.message : 'Unknown error'
+                })}\n\n`)
+              );
+            } catch (enqueueError) {
+              console.warn('Client already disconnected, cannot send error');
+            }
             controller.close();
             return;
           }
         }
 
-        // Send completion message
-        const completionData = {
-          completed: true,
-          sceneImages,
-        };
-        controller.enqueue(
-          encoder.encode(`data: ${JSON.stringify(completionData)}\n\n`)
-        );
-
-        console.log('All scenes generated successfully!');
+        // Send completion message (with error handling)
+        try {
+          const completionData = {
+            completed: true,
+            sceneImages,
+          };
+          controller.enqueue(
+            encoder.encode(`data: ${JSON.stringify(completionData)}\n\n`)
+          );
+          console.log('All scenes generated successfully!');
+        } catch (enqueueError) {
+          console.warn('Client disconnected before completion message, but all images were generated');
+        }
+        
         controller.close();
 
       } catch (error) {

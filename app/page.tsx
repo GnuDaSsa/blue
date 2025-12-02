@@ -182,7 +182,9 @@ export default function Home() {
                   }
                 } catch (parseError) {
                   console.warn('JSON parse error (will retry with next chunk):', parseError);
+                  console.warn('Problematic line:', line);
                   // Don't throw - just log and continue, the buffer will accumulate
+                  // This allows the SSE connection to stay open
                 }
               }
             }
