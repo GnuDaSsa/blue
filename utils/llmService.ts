@@ -44,9 +44,11 @@ IMPORTANT:
 - Include diverse camera angles (wide shot, close-up, medium shot, aerial view, etc.)
 - Include varied lighting (dramatic, soft, neon, golden hour, etc.)
 - Make scenes emotionally resonant with the lyrics
-- Return ONLY the JSON object, no additional text
+- Return ONLY valid JSON, no markdown formatting, no code blocks
+- Ensure all JSON strings are properly escaped
+- Use double quotes for all JSON strings
 
-JSON RESPONSE:`;
+Return the JSON response now:`;
 
   try {
     const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
@@ -61,10 +63,11 @@ JSON RESPONSE:`;
           }]
         }],
         generationConfig: {
-          temperature: 0.9,
+          temperature: 0.7,
           topK: 40,
           topP: 0.95,
           maxOutputTokens: 8192,
+          responseMimeType: "application/json",
         }
       }),
     });
@@ -79,12 +82,26 @@ JSON RESPONSE:`;
     const textResponse = data.candidates[0].content.parts[0].text;
     
     // Extract JSON from response (remove markdown code blocks if present)
-    const jsonMatch = textResponse.match(/\{[\s\S]*\}/);
+    let jsonText = textResponse;
+    
+    // Remove markdown code blocks if present
+    jsonText = jsonText.replace(/```json\n?/g, '').replace(/```\n?/g, '');
+    
+    // Try to find JSON object
+    const jsonMatch = jsonText.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
+      console.error('Failed to extract JSON from response:', textResponse);
       throw new Error('Failed to extract JSON from LLM response');
     }
 
-    const parsedResponse: LLMResponse = JSON.parse(jsonMatch[0]);
+    let parsedResponse: LLMResponse;
+    try {
+      parsedResponse = JSON.parse(jsonMatch[0]);
+    } catch (parseError) {
+      console.error('JSON parse error:', parseError);
+      console.error('Attempted to parse:', jsonMatch[0].substring(0, 500));
+      throw new Error(`Failed to parse JSON: ${parseError instanceof Error ? parseError.message : 'Unknown error'}`);
+    }
     
     // Validate response structure
     if (!parsedResponse.protagonist_prompt || !Array.isArray(parsedResponse.scene_prompts)) {
