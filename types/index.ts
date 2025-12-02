@@ -8,6 +8,7 @@ export interface ScenePrompt {
 }
 
 export interface LLMResponse {
+  mood_analysis?: string;
   protagonist_prompt: string;
   scene_prompts: ScenePrompt[];
 }

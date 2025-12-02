@@ -23,6 +23,17 @@ export default function StoryboardReview({ storyboard, onConfirm, onBack }: Stor
           AI가 생성한 스토리보드를 확인하고 진행하세요
         </p>
 
+        {/* Mood Analysis */}
+        {storyboard.mood_analysis && (
+          <div className="mb-6 p-5 bg-gradient-to-r from-purple-900/30 to-pink-900/30 rounded-xl border border-purple-400/40">
+            <div className="flex items-center gap-3 mb-2">
+              <span className="text-2xl">🎭</span>
+              <h3 className="text-xl font-bold text-purple-300">노래 무드 분석</h3>
+            </div>
+            <p className="text-gray-200 leading-relaxed text-lg">{storyboard.mood_analysis}</p>
+          </div>
+        )}
+
         {/* Protagonist Description */}
         <div className="mb-8 p-6 bg-black/30 rounded-xl border border-purple-500/30">
           <h3 className="text-2xl font-bold mb-3 text-purple-400">👤 주인공 설정</h3>

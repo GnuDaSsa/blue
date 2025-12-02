@@ -14,30 +14,49 @@ You are a professional music video director and storyboard artist. Analyze the f
 LYRICS:
 ${lyrics}
 
-CRITICAL REQUIREMENTS FOR PROTAGONIST:
-1. Style: Modern anime/webtoon style - HIGH QUALITY animation character design
-   - Think: Netflix anime, Crunchyroll originals, modern Korean webtoon art
-   - NOT children's textbook style, NOT educational material style
-   - Sharp, sophisticated, mature character design
-2. Proportions: REALISTIC ANIME PROPORTIONS (8-head tall, NOT chibi, NOT big-headed)
-   - Adult proportions with mature facial structure
-   - Sharp jawline, defined features, realistic body ratios
-3. Face: Sharp, expressive features
-   - Piercing eyes with intense gaze (almond-shaped, sharp eyeliner)
-   - Strong eyebrows, defined nose, full lips with attitude
-   - Confident, cool, or mysterious expression (NOT cute/innocent)
-4. Hair: Stylish, dynamic hair with flow and volume
-   - Modern cuts with interesting colors/highlights
-   - Hair should have movement and personality
-5. Fashion: Modern, stylish clothing
-   - Urban fashion, streetwear, or edgy style
-   - Detailed accessories and layers
-6. Background: Pure white background (#FFFFFF)
-7. Overall vibe: COOL, CONFIDENT, CHARISMATIC - like a main character from a hit anime series
+STEP 1: ANALYZE MOOD AND STYLE
+First, carefully analyze the lyrics to determine:
+- Overall mood: (romantic, melancholic, energetic, dark, uplifting, nostalgic, rebellious, peaceful, etc.)
+- Visual tone: (bright & vibrant, dark & moody, pastel & soft, neon & edgy, warm & cozy, cold & distant, etc.)
+- Setting preference: (urban, nature, indoor, fantasy, retro, futuristic, etc.)
+- Character vibe: (cool & confident, soft & vulnerable, fierce & powerful, cute & playful, mysterious & enigmatic, etc.)
 
-Please return a JSON object with the following structure:
+Based on your analysis, adapt the art style accordingly:
+- For BRIGHT/UPLIFTING songs → Use vibrant colors, warm lighting, cheerful expressions, sunny environments
+- For DARK/MELANCHOLIC songs → Use muted colors, dramatic shadows, intense expressions, moody atmospheres  
+- For ROMANTIC/SOFT songs → Use pastel tones, gentle lighting, tender expressions, dreamy settings
+- For ENERGETIC/REBELLIOUS songs → Use bold colors, dynamic poses, fierce expressions, urban/edgy settings
+- For NOSTALGIC songs → Use warm vintage tones, soft focus, contemplative expressions, retro settings
+
+STEP 2: CREATE PROTAGONIST BASED ON MOOD
+Design a protagonist that MATCHES the song's mood and visual tone:
+
+REQUIRED ELEMENTS:
+1. Art Style: Modern anime/webtoon (Netflix/Crunchyroll quality)
+   - NOT textbook/educational style
+   - High-quality character design
+2. Proportions: REALISTIC 8-head tall adult (NOT chibi, NOT big-headed)
+3. Background: Pure white (#FFFFFF)
+
+MOOD-ADAPTIVE DESIGN:
+- If song is BRIGHT/HAPPY → Warm colors, soft smile, approachable features, casual trendy fashion, bright eyes
+- If song is DARK/INTENSE → Cool colors, intense gaze, sharp features, edgy/leather fashion, dramatic styling
+- If song is ROMANTIC/SOFT → Pastel colors, gentle expression, delicate features, elegant/flowing fashion, dreamy look
+- If song is ENERGETIC/BOLD → Vibrant colors, confident pose, dynamic features, sporty/street fashion, fierce attitude
+- If song is MELANCHOLIC/SAD → Muted colors, contemplative expression, softer features, simple/understated fashion, distant gaze
+- If song is MYSTERIOUS/COOL → Monochrome or deep tones, enigmatic expression, refined features, sophisticated fashion, alluring presence
+
+FLEXIBILITY: The character should reflect the song's emotional core through:
+- Color palette (warm/cool, bright/muted, vibrant/subtle)
+- Expression (happy/sad, fierce/gentle, confident/vulnerable)
+- Fashion style (casual/formal, edgy/soft, modern/retro)
+- Overall energy (high/low, intense/calm, bold/subtle)
+
+STEP 3: OUTPUT JSON
+Return a JSON object with:
 {
-  "protagonist_prompt": "EXTREMELY DETAILED modern anime character with REALISTIC PROPORTIONS (8-head tall adult). MUST include: Sharp facial features with intense eyes (almond-shaped, detailed eyeliner, specific color), strong eyebrows, defined nose and jawline, expressive lips with confident/cool attitude. Dynamic stylish hair (modern cut, interesting color with highlights, flowing movement). Age: 20s-30s with mature, sophisticated appearance. Fashion: Modern urban/streetwear style with detailed clothing layers and accessories. Body: Athletic/lean build with realistic adult proportions (NOT chibi, NOT big-headed). Pose: Confident, dynamic stance showing personality. Art style: High-quality modern anime illustration (Netflix/Crunchyroll quality, NOT textbook style). Pure white background (#FFFFFF). Overall vibe: COOL, CHARISMATIC main character energy.",
+  "mood_analysis": "Brief 1-2 sentence description of the song's overall mood, emotional tone, and recommended visual style",
+  "protagonist_prompt": "EXTREMELY DETAILED modern anime character (8-head tall adult, realistic proportions) designed to MATCH THE SONG'S MOOD. Include: mood-appropriate color palette, expression matching emotional tone, fashion style fitting the vibe, detailed features (eyes, hair, clothing), accessories. Art style: Modern anime (Netflix quality, NOT textbook style). White background. Reflect the song's emotional core in the character's design, colors, and energy.",
 
   "scene_prompts": [
     {
@@ -96,6 +115,9 @@ Generate a highly detailed, professional storyboard now:`;
           responseSchema: {
             type: "object",
             properties: {
+              mood_analysis: {
+                type: "string"
+              },
               protagonist_prompt: {
                 type: "string"
               },
