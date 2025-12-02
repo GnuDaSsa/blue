@@ -67,7 +67,7 @@ STEP 4: OUTPUT JSON
 Return a JSON object with:
 {
   "mood_analysis": "Brief 1-2 sentence description of the song's overall mood, emotional tone, and recommended visual style",
-  "protagonist_prompt": "EXTREMELY DETAILED modern anime character designed to MATCH THE SONG'S MOOD. Include: mood-appropriate color palette, expression matching emotional tone, fashion style fitting the vibe, well-balanced proportions suitable for the mood, detailed features (eyes, hair, clothing), accessories. Art style: Modern anime (Netflix quality, NOT textbook style). White background. This is the main/representative prompt shown in UI.",
+  "protagonist_prompt": "EXTREMELY DETAILED modern anime character designed to MATCH THE SONG'S MOOD. Include: mood-appropriate color palette, expression matching emotional tone, fashion style fitting the vibe, natural well-balanced proportions (DO NOT mention specific head-to-body ratios), detailed features (eyes, hair, clothing), accessories. Art style: Modern anime (Netflix quality, NOT textbook style). White background. This is the main/representative prompt shown in UI. IMPORTANT: Focus on describing visual style, personality, and mood - avoid technical proportion specifications.",
   "protagonist_variations": [
     "Variation 1: [Confident/Cool mood] Detailed prompt...",
     "Variation 2: [Gentle/Soft mood] Detailed prompt...",
