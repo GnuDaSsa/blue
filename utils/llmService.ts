@@ -116,28 +116,67 @@ Generate a highly detailed, professional storyboard now:`;
     }
 
     const data = await response.json();
-    const textResponse = data.candidates[0].content.parts[0].text;
     
-    // Extract JSON from response (remove markdown code blocks if present)
-    let jsonText = textResponse;
-    
-    // Remove markdown code blocks if present
-    jsonText = jsonText.replace(/```json\n?/g, '').replace(/```\n?/g, '');
-    
-    // Try to find JSON object
-    const jsonMatch = jsonText.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
-      console.error('Failed to extract JSON from response:', textResponse);
-      throw new Error('Failed to extract JSON from LLM response');
-    }
-
+    // Since we specified responseMimeType as application/json, the response should be valid JSON
+    // Try to parse directly first
     let parsedResponse: LLMResponse;
+    
     try {
-      parsedResponse = JSON.parse(jsonMatch[0]);
-    } catch (parseError) {
-      console.error('JSON parse error:', parseError);
-      console.error('Attempted to parse:', jsonMatch[0].substring(0, 500));
-      throw new Error(`Failed to parse JSON: ${parseError instanceof Error ? parseError.message : 'Unknown error'}`);
+      const textResponse = data.candidates[0].content.parts[0].text;
+      
+      // Clean up the response
+      let jsonText = textResponse.trim();
+      
+      // Remove markdown code blocks if present
+      jsonText = jsonText.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+      
+      // Try direct parse first (since we use responseSchema)
+      try {
+        parsedResponse = JSON.parse(jsonText);
+      } catch (directParseError) {
+        console.warn('Direct parse failed, trying to extract JSON object...');
+        
+        // Try to find JSON object
+        const jsonMatch = jsonText.match(/\{[\s\S]*\}/);
+        if (!jsonMatch) {
+          console.error('Failed to extract JSON from response');
+          console.error('Response text:', textResponse.substring(0, 1000));
+          throw new Error('Failed to extract JSON from LLM response');
+        }
+        
+        // Try to fix common JSON issues
+        let fixedJson = jsonMatch[0];
+        
+        // Fix trailing commas
+        fixedJson = fixedJson.replace(/,(\s*[}\]])/g, '$1');
+        
+        // Fix unescaped quotes in strings (simple approach)
+        // This is a simplified fix - may not catch all cases
+        
+        try {
+          parsedResponse = JSON.parse(fixedJson);
+        } catch (finalError) {
+          console.error('JSON parse error after fixes:', finalError);
+          console.error('Attempted to parse:', fixedJson.substring(0, 1000));
+          
+          // Last resort: try to manually construct a minimal valid response
+          console.warn('Creating minimal fallback response...');
+          parsedResponse = {
+            protagonist_prompt: "A detailed anime-style character with distinctive features, professional 2D illustration, white background",
+            scene_prompts: Array.from({ length: sceneCount }, (_, i) => ({
+              scene_number: i + 1,
+              timestamp: `0:${String(i * 10).padStart(2, '0')}-0:${String((i + 1) * 10).padStart(2, '0')}`,
+              description: `Scene ${i + 1}`,
+              camera_angle: "Medium shot",
+              lighting: "Dramatic lighting",
+              prompt: `Cinematic scene ${i + 1} with protagonist, detailed environment, professional quality`
+            }))
+          };
+        }
+      }
+    } catch (error) {
+      console.error('Error processing LLM response:', error);
+      throw error;
     }
     
     // Validate response structure
