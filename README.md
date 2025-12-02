@@ -37,18 +37,31 @@ npm install
 
 ### 2. 환경 변수 설정
 
-`.env.local` 파일을 생성하고 API 키를 설정합니다:
+**방법 1: 대화형 설정 스크립트 사용 (추천) 🔐**
 
 ```bash
-cp .env.example .env.local
+./setup-env.sh
 ```
 
-`.env.local` 파일을 편집하여 실제 API 키를 입력:
+스크립트가 안전하게 API 키를 입력받아 `.env.local` 파일을 생성합니다.
 
+**방법 2: 수동 설정**
+
+```bash
+# 터미널에서 직접 편집
+nano .env.local
+
+# 또는 vi 사용
+vi .env.local
+```
+
+다음 형식으로 입력:
 ```env
 GEMINI_API_KEY=your_actual_gemini_api_key
 NANOBANANA_API_KEY=your_actual_nanobanana_api_key
 ```
+
+⚠️ **보안 주의**: API 키를 절대 채팅이나 공개 장소에 입력하지 마세요!
 
 ### 3. 개발 서버 실행
 
