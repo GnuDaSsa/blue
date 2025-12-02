@@ -92,8 +92,10 @@ export default function Home() {
   const handleProtagonistSelect = async (selectedImage: ProtagonistImage) => {
     setGenerationState({
       status: 'generating_scenes',
-      message: '30컷의 뮤직비디오 이미지를 생성하고 있습니다... (약 5-10분 소요)',
+      message: `${sceneCount}컷의 뮤직비디오 이미지를 생성하고 있습니다...`,
       progress: 0,
+      totalScenes: sceneCount,
+      sceneImages: [],
     });
 
     try {
@@ -126,11 +128,22 @@ export default function Home() {
               const data = JSON.parse(line.slice(6));
               
               if (data.progress !== undefined) {
-                setGenerationState(prev => ({
-                  ...prev,
-                  progress: data.progress,
-                  message: `이미지 생성 중... (${data.progress}/30)`,
-                }));
+                setGenerationState(prev => {
+                  const newSceneImages = [...(prev.sceneImages || [])];
+                  
+                  // Add newly generated image if available
+                  if (data.imageUrl) {
+                    newSceneImages.push(data.imageUrl);
+                  }
+                  
+                  return {
+                    ...prev,
+                    progress: data.progress,
+                    totalScenes: data.total || prev.totalScenes,
+                    message: `이미지 생성 중... (${data.progress}/${data.total || sceneCount})`,
+                    sceneImages: newSceneImages,
+                  };
+                });
               }
 
               if (data.completed && data.sceneImages) {
@@ -180,6 +193,8 @@ export default function Home() {
           <LoadingSpinner 
             message={generationState.message} 
             progress={generationState.progress}
+            totalScenes={generationState.totalScenes}
+            sceneImages={generationState.sceneImages}
           />
         )}
 

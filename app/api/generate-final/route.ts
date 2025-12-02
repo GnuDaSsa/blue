@@ -33,14 +33,15 @@ export async function POST(request: NextRequest) {
           return;
         }
 
-        console.log('Starting scene generation with protagonist image...');
+        console.log(`Starting scene generation with protagonist image... (${scenePrompts.length} scenes)`);
 
-        // Generate all 30 scene images with progress updates
+        // Generate all scene images with progress updates
         const sceneImages: string[] = [];
+        const totalScenes = scenePrompts.length;
 
-        for (let i = 0; i < scenePrompts.length; i++) {
+        for (let i = 0; i < totalScenes; i++) {
           try {
-            console.log(`Generating scene ${i + 1}/30...`);
+            console.log(`Generating scene ${i + 1}/${totalScenes}...`);
             
             // Import generateImage directly to have more control
             const { generateImage } = await import('@/utils/imageService');
@@ -53,10 +54,12 @@ export async function POST(request: NextRequest) {
 
             sceneImages.push(imageUrl);
 
-            // Send progress update to client
+            // Send progress update with image to client
             const progressData = {
               progress: i + 1,
-              total: 30,
+              total: totalScenes,
+              imageUrl: imageUrl, // Send the newly generated image
+              sceneNumber: i + 1,
             };
             controller.enqueue(
               encoder.encode(`data: ${JSON.stringify(progressData)}\n\n`)

@@ -24,5 +24,6 @@ export interface GenerationState {
   protagonistImages?: ProtagonistImage[];
   sceneImages?: string[];
   progress?: number;
+  totalScenes?: number;
   error?: string;
 }

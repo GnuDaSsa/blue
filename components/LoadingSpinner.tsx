@@ -1,11 +1,15 @@
 'use client';
 
+import Image from 'next/image';
+
 interface LoadingSpinnerProps {
   message: string;
   progress?: number;
+  totalScenes?: number;
+  sceneImages?: string[];
 }
 
-export default function LoadingSpinner({ message, progress }: LoadingSpinnerProps) {
+export default function LoadingSpinner({ message, progress, totalScenes, sceneImages }: LoadingSpinnerProps) {
   return (
     <div className="max-w-2xl mx-auto">
       <div className="glass-morphism rounded-2xl p-12 shadow-2xl text-center">
@@ -21,17 +25,44 @@ export default function LoadingSpinner({ message, progress }: LoadingSpinnerProp
           {message}
         </h3>
 
-        {progress !== undefined && (
+        {progress !== undefined && totalScenes && (
           <div className="mt-6">
             <div className="bg-gray-800 rounded-full h-4 overflow-hidden">
               <div
                 className="bg-gradient-to-r from-purple-500 to-pink-500 h-full transition-all duration-500 ease-out"
-                style={{ width: `${(progress / 30) * 100}%` }}
+                style={{ width: `${(progress / totalScenes) * 100}%` }}
               ></div>
             </div>
             <p className="text-gray-400 mt-2">
-              {progress} / 30 씬 완료
+              {progress} / {totalScenes} 씬 완료
             </p>
+          </div>
+        )}
+
+        {/* Display generated images in real-time */}
+        {sceneImages && sceneImages.length > 0 && (
+          <div className="mt-8">
+            <p className="text-center text-purple-400 mb-4 font-semibold">
+              생성된 이미지 미리보기
+            </p>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 max-h-96 overflow-y-auto p-4 bg-black/20 rounded-xl">
+              {sceneImages.map((imageUrl, index) => (
+                <div
+                  key={index}
+                  className="relative aspect-video rounded-lg overflow-hidden ring-2 ring-purple-500/30 hover:ring-purple-500 transition-all animate-fadeIn"
+                >
+                  <Image
+                    src={imageUrl}
+                    alt={`Scene ${index + 1}`}
+                    fill
+                    className="object-cover"
+                  />
+                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent text-white text-center py-1 text-xs">
+                    Scene {index + 1}
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         )}
 
