@@ -15,11 +15,13 @@ export async function POST(request: NextRequest) {
 
     // Retrieve storyboard from session
     console.log('Looking for session:', sessionId);
+    (sessionStore as any).debug();
     
     if (!sessionStore.has(sessionId)) {
       console.error('Session not found:', sessionId);
+      console.error('This might be due to Hot Module Replacement in development');
       return NextResponse.json(
-        { error: 'Session not found or expired' },
+        { error: 'Session not found or expired. Please try generating the storyboard again.' },
         { status: 404 }
       );
     }

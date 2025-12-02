@@ -33,6 +33,10 @@ export async function POST(request: NextRequest) {
       timestamp: Date.now(),
     });
 
+    console.log('Created session:', sessionId);
+    console.log('Stored storyboard with', storyboard.scene_prompts.length, 'scenes');
+    console.log('Session verification:', sessionStore.has(sessionId));
+
     // Return storyboard for review (protagonist generation will be separate)
     return NextResponse.json({
       sessionId,
