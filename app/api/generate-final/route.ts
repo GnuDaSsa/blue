@@ -9,7 +9,7 @@ export async function POST(request: NextRequest) {
   const stream = new ReadableStream({
     async start(controller) {
       try {
-        const { protagonistImageUrl, noProtagonist, sessionId } = await request.json();
+        const { protagonistImageUrl, noProtagonist, sessionId, aspectRatio = '16:9' } = await request.json();
 
         // Retrieve storyboard from session (if sessionId provided)
         let scenePrompts;
@@ -42,6 +42,7 @@ export async function POST(request: NextRequest) {
               prompt: scenePrompts[i].prompt,
               referenceImageUrl: noProtagonist ? undefined : protagonistImageUrl,
               useCharacterConsistency: !noProtagonist,
+              aspectRatio: aspectRatio as '16:9' | '9:16',
             });
 
             sceneImages.push(imageUrl);

@@ -16,10 +16,12 @@ export default function Home() {
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [lyrics, setLyrics] = useState<string>('');
   const [sceneCount, setSceneCount] = useState(20);
+  const [aspectRatio, setAspectRatio] = useState<'16:9' | '9:16'>('16:9');
 
-  const handleGenerateStart = async (inputLyrics: string, selectedSceneCount: number) => {
+  const handleGenerateStart = async (inputLyrics: string, selectedSceneCount: number, selectedAspectRatio: '16:9' | '9:16') => {
     setLyrics(inputLyrics);
     setSceneCount(selectedSceneCount);
+    setAspectRatio(selectedAspectRatio);
     setGenerationState({
       status: 'generating_story',
       message: 'AI가 가사를 분석하고 스토리보드를 생성하고 있습니다...',
@@ -169,7 +171,8 @@ export default function Home() {
         body: JSON.stringify({ 
           protagonistImageUrl: selectedImage?.url || null,
           noProtagonist: noProtagonist,
-          sessionId: sessionId
+          sessionId: sessionId,
+          aspectRatio: aspectRatio
         }),
       });
 

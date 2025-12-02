@@ -42,7 +42,8 @@ export async function POST(request: NextRequest) {
     console.log('Protagonist prompt:', storyboard.protagonist_prompt.substring(0, 200));
     
     const protagonistImageUrls = await generateProtagonistImages(
-      storyboard.protagonist_prompt
+      storyboard.protagonist_prompt,
+      storyboard.protagonist_variations
     );
 
     // Return protagonist images to frontend

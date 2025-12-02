@@ -35,7 +35,9 @@ REQUIRED ELEMENTS:
 1. Art Style: Modern anime/webtoon (Netflix/Crunchyroll quality)
    - NOT textbook/educational style
    - High-quality character design
-2. Proportions: REALISTIC 8-head tall adult (NOT chibi, NOT big-headed)
+2. Proportions: Natural, well-balanced proportions suitable for the mood
+   - Adapt proportions to match the song's vibe
+   - NOT forced into specific ratios
 3. Background: Pure white (#FFFFFF)
 
 MOOD-ADAPTIVE DESIGN:
@@ -52,11 +54,26 @@ FLEXIBILITY: The character should reflect the song's emotional core through:
 - Fashion style (casual/formal, edgy/soft, modern/retro)
 - Overall energy (high/low, intense/calm, bold/subtle)
 
-STEP 3: OUTPUT JSON
+STEP 3: CREATE 4 PROTAGONIST VARIATIONS
+Generate 4 different interpretations of the protagonist, each emphasizing different moods/aspects:
+- Variation 1: Confident/Cool mood - strong, charismatic presence
+- Variation 2: Gentle/Soft mood - approachable, warm expression
+- Variation 3: Mysterious/Enigmatic mood - intriguing, distant aura
+- Variation 4: Dynamic/Energetic mood - vibrant, lively personality
+
+Each variation should maintain the core character identity but express different emotional facets.
+
+STEP 4: OUTPUT JSON
 Return a JSON object with:
 {
   "mood_analysis": "Brief 1-2 sentence description of the song's overall mood, emotional tone, and recommended visual style",
-  "protagonist_prompt": "EXTREMELY DETAILED modern anime character (8-head tall adult, realistic proportions) designed to MATCH THE SONG'S MOOD. Include: mood-appropriate color palette, expression matching emotional tone, fashion style fitting the vibe, detailed features (eyes, hair, clothing), accessories. Art style: Modern anime (Netflix quality, NOT textbook style). White background. Reflect the song's emotional core in the character's design, colors, and energy.",
+  "protagonist_prompt": "EXTREMELY DETAILED modern anime character designed to MATCH THE SONG'S MOOD. Include: mood-appropriate color palette, expression matching emotional tone, fashion style fitting the vibe, well-balanced proportions suitable for the mood, detailed features (eyes, hair, clothing), accessories. Art style: Modern anime (Netflix quality, NOT textbook style). White background. This is the main/representative prompt shown in UI.",
+  "protagonist_variations": [
+    "Variation 1: [Confident/Cool mood] Detailed prompt...",
+    "Variation 2: [Gentle/Soft mood] Detailed prompt...",
+    "Variation 3: [Mysterious/Enigmatic mood] Detailed prompt...",
+    "Variation 4: [Dynamic/Energetic mood] Detailed prompt..."
+  ],
 
   "scene_prompts": [
     {
@@ -65,7 +82,7 @@ Return a JSON object with:
       "description": "Scene description matching the lyrics",
       "camera_angle": "Camera angle (wide shot, close-up, etc.)",
       "lighting": "Lighting description (dramatic, soft, neon, etc.)",
-      "prompt": "DETAILED anime scene with REALISTIC PROPORTIONS. Protagonist (8-head tall, mature features, sharp eyes, confident expression) performing specific action with strong emotion. Environment: detailed location with atmospheric elements, depth, and scale. Mood: intense and cinematic. Camera: dynamic angle with professional framing. Lighting: dramatic with strong contrast and depth. Art style: High-quality modern anime illustration (anime film/series quality, professional animation frame), detailed shading and highlights, vibrant but sophisticated colors. NOT textbook style, NOT educational illustration. Think: Studio Trigger, MAPPA, Netflix anime quality. Composition: Dynamic, engaging, with strong visual impact."
+      "prompt": "DETAILED anime scene with well-balanced proportions. Protagonist (mature features, expressive eyes, fitting the mood) performing specific action with strong emotion. Environment: detailed location with atmospheric elements, depth, and scale. Mood: intense and cinematic. Camera: dynamic angle with professional framing. Lighting: dramatic with strong contrast and depth. Art style: High-quality modern anime illustration (anime film/series quality, professional animation frame), detailed shading and highlights, vibrant but sophisticated colors. NOT textbook style, NOT educational illustration. Think: Studio Trigger, MAPPA, Netflix anime quality. Composition: Dynamic, engaging, with strong visual impact."
     },
     ... (30 scenes total)
   ]
@@ -73,9 +90,9 @@ Return a JSON object with:
 
 IMPORTANT INSTRUCTIONS FOR CHARACTER STYLE:
 - Art style: Modern anime/webtoon (high-quality series style, NOT textbook/educational style)
-- Proportions: REALISTIC 8-head tall adults with mature features (NOT chibi, NOT big-headed)
-- Face: Sharp, intense features with strong expressions (cool/confident, NOT cute/innocent)
-- Overall vibe: Main character from a popular anime series - COOL, CHARISMATIC, DYNAMIC
+- Proportions: Natural, well-balanced proportions that fit the mood (NOT forced ratios)
+- Face: Expressive features with strong personality (adapt to song mood)
+- Overall vibe: Main character from a popular anime series - matches the song's emotional tone
 - Protagonist prompt MUST be EXTREMELY DETAILED (minimum 120 words) with specific physical features
 - Include unique identifying features that make the character memorable and consistent
 - Create exactly ${sceneCount} scenes distributed evenly across the song duration
@@ -120,6 +137,12 @@ Generate a highly detailed, professional storyboard now:`;
               },
               protagonist_prompt: {
                 type: "string"
+              },
+              protagonist_variations: {
+                type: "array",
+                items: {
+                  type: "string"
+                }
               },
               scene_prompts: {
                 type: "array",

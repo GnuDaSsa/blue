@@ -10,6 +10,7 @@ export interface ScenePrompt {
 export interface LLMResponse {
   mood_analysis?: string;
   protagonist_prompt: string;
+  protagonist_variations?: string[]; // 4 different mood variations for protagonist
   scene_prompts: ScenePrompt[];
 }
 

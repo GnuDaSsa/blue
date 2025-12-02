@@ -1,5 +1,7 @@
-// Gemini Image Generation API (Nano Banana Pro = Gemini 2.5 Flash Image)
+// Gemini Image Generation API (Latest Gemini Image Model)
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+// Using Gemini 2.5 Flash Image (latest stable model for image generation)
+// Alternative: 'gemini-2.5-pro-image' for even better quality (if available)
 const GEMINI_IMAGE_MODEL = 'gemini-2.5-flash-image';
 const GEMINI_IMAGE_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_IMAGE_MODEL}:generateContent`;
 
@@ -7,6 +9,7 @@ interface ImageGenerationOptions {
   prompt: string;
   referenceImageUrl?: string;
   useCharacterConsistency?: boolean;
+  aspectRatio?: '16:9' | '9:16' | '1:1';
 }
 
 export async function generateImage(options: ImageGenerationOptions): Promise<string> {
@@ -14,7 +17,7 @@ export async function generateImage(options: ImageGenerationOptions): Promise<st
     throw new Error('GEMINI_API_KEY is not configured');
   }
 
-  const { prompt, referenceImageUrl, useCharacterConsistency } = options;
+  const { prompt, referenceImageUrl, useCharacterConsistency, aspectRatio = '1:1' } = options;
 
   // Build request body for Gemini image generation
   const parts: any[] = [{ text: prompt }];
@@ -41,6 +44,13 @@ export async function generateImage(options: ImageGenerationOptions): Promise<st
     }
   }
 
+  // Map aspect ratio to Gemini's format
+  const aspectRatioConfig: { [key: string]: string } = {
+    '16:9': '16:9',
+    '9:16': '9:16',
+    '1:1': '1:1'
+  };
+
   const requestBody = {
     contents: [{
       parts: parts
@@ -49,6 +59,10 @@ export async function generateImage(options: ImageGenerationOptions): Promise<st
       temperature: 0.8,
       topK: 40,
       topP: 0.95,
+      responseModalities: ['image'],
+      outputOptions: {
+        aspectRatio: aspectRatioConfig[aspectRatio]
+      }
     }
   };
 
@@ -91,29 +105,35 @@ export async function generateImage(options: ImageGenerationOptions): Promise<st
   }
 }
 
-export async function generateProtagonistImages(protagonistPrompt: string): Promise<string[]> {
+export async function generateProtagonistImages(
+  protagonistPrompt: string, 
+  protagonistVariations?: string[]
+): Promise<string[]> {
   const images: string[] = [];
   
-  // Generate 4 protagonist candidate images with slight variations
-  const variations = [
-    'front view, confident stance, intense gaze, sharp features, realistic 8-head proportions, modern anime style',
-    '3/4 angle view, cool expression, dynamic pose, detailed face with strong features, mature proportions',
-    'dynamic action pose, powerful presence, detailed character design, adult anime proportions, striking appearance',
-    'expressive pose showing personality, charismatic attitude, modern fashion detail, professional anime character art'
-  ];
+  // Use provided variations if available, otherwise create default variations
+  const prompts = protagonistVariations && protagonistVariations.length === 4
+    ? protagonistVariations
+    : [
+        `${protagonistPrompt}. Confident/Cool mood: strong presence, charismatic expression, sharp gaze`,
+        `${protagonistPrompt}. Gentle/Soft mood: warm expression, approachable demeanor, soft features`,
+        `${protagonistPrompt}. Mysterious/Enigmatic mood: intriguing aura, enigmatic expression, captivating presence`,
+        `${protagonistPrompt}. Dynamic/Energetic mood: vibrant personality, lively expression, energetic pose`
+      ];
   
-  const qualityEnhancement = 'high-quality modern anime style, realistic 8-head proportions, sharp facial features, mature character design, detailed shading and highlights, clean linework, professional anime series quality (Netflix anime, Crunchyroll original quality), NOT chibi style, NOT textbook illustration, vibrant sophisticated colors, perfect adult anatomy, charismatic main character energy';
+  const qualityEnhancement = 'high-quality modern anime style, detailed shading and highlights, clean linework, professional anime series quality (Netflix anime, Crunchyroll original quality), NOT chibi style, NOT textbook illustration, vibrant sophisticated colors, charismatic character energy';
   
   for (let i = 0; i < 4; i++) {
     try {
-      // Add variation to each generation while maintaining core character
-      const variedPrompt = `${protagonistPrompt}. ${variations[i]}. ${qualityEnhancement}. IMPORTANT: realistic 8-head tall proportions, adult mature face with sharp features, NOT big-headed, NOT cute chibi style. Pure white background (#FFFFFF).`;
+      // Use each specific variation prompt
+      const variedPrompt = `${prompts[i]}. ${qualityEnhancement}. Pure white background (#FFFFFF).`;
       
-      console.log(`Generating protagonist candidate ${i + 1}/4 with detailed prompt`);
+      console.log(`Generating protagonist candidate ${i + 1}/4 with mood variation ${i + 1}`);
       
       const imageUrl = await generateImage({
         prompt: variedPrompt,
         useCharacterConsistency: false,
+        aspectRatio: '1:1', // Protagonist images are always square
       });
       images.push(imageUrl);
       
@@ -144,12 +164,13 @@ export async function generateSceneImages(
       console.log(`Generating scene ${i + 1}/${scenePrompts.length}...`);
       
       // Enhance scene prompt with quality keywords
-      const enhancedPrompt = `${scenePrompts[i].prompt}. ${qualityEnhancement}. CRITICAL: Maintain exact character appearance from reference image - same face, same proportions (8-head tall), same sharp features, same style. Character should look identical to reference.`;
+      const enhancedPrompt = `${scenePrompts[i].prompt}. ${qualityEnhancement}. CRITICAL: Maintain exact character appearance from reference image - same face, same features, same style. Character should look identical to reference.`;
       
       const imageUrl = await generateImage({
         prompt: enhancedPrompt,
         referenceImageUrl: protagonistImageUrl,
         useCharacterConsistency: true,
+        aspectRatio: '16:9', // Default aspect ratio, will be overridden in API call
       });
       
       sceneImages.push(imageUrl);
