@@ -96,18 +96,18 @@ export async function generateProtagonistImages(protagonistPrompt: string): Prom
   
   // Generate 4 protagonist candidate images with slight variations
   const variations = [
-    'front view, centered composition, standing straight, neutral expression, professional character sheet style',
-    '3/4 angle view, slight smile, confident posture, detailed facial features',
-    'side profile view, clean silhouette, distinctive features visible, character design reference',
-    'dynamic pose, expressive face, personality showing, detailed clothing and accessories'
+    'front view, confident stance, intense gaze, sharp features, realistic 8-head proportions, modern anime style',
+    '3/4 angle view, cool expression, dynamic pose, detailed face with strong features, mature proportions',
+    'dynamic action pose, powerful presence, detailed character design, adult anime proportions, striking appearance',
+    'expressive pose showing personality, charismatic attitude, modern fashion detail, professional anime character art'
   ];
   
-  const qualityEnhancement = 'masterpiece, best quality, ultra detailed, sharp focus, clean lines, professional 2D illustration, anime art style, character concept art, vibrant colors, high resolution, detailed shading, perfect anatomy';
+  const qualityEnhancement = 'high-quality modern anime style, realistic 8-head proportions, sharp facial features, mature character design, detailed shading and highlights, clean linework, professional anime series quality (Netflix anime, Crunchyroll original quality), NOT chibi style, NOT textbook illustration, vibrant sophisticated colors, perfect adult anatomy, charismatic main character energy';
   
   for (let i = 0; i < 4; i++) {
     try {
       // Add variation to each generation while maintaining core character
-      const variedPrompt = `${protagonistPrompt}. ${variations[i]}. ${qualityEnhancement}. Pure white background.`;
+      const variedPrompt = `${protagonistPrompt}. ${variations[i]}. ${qualityEnhancement}. IMPORTANT: realistic 8-head tall proportions, adult mature face with sharp features, NOT big-headed, NOT cute chibi style. Pure white background (#FFFFFF).`;
       
       console.log(`Generating protagonist candidate ${i + 1}/4 with detailed prompt`);
       
@@ -137,14 +137,14 @@ export async function generateSceneImages(
 ): Promise<string[]> {
   const sceneImages: string[] = [];
   
-  const qualityEnhancement = 'cinematic composition, movie scene quality, dramatic lighting, ultra detailed, high resolution, professional photography, vibrant colors, depth of field, atmospheric, 4K quality';
+  const qualityEnhancement = 'high-quality anime scene, modern animation style (Netflix anime quality), realistic character proportions, sharp facial features, dynamic composition, dramatic lighting with strong contrast, detailed environment, vibrant sophisticated colors, cinematic framing, professional anime film/series quality, detailed shading and depth, NOT textbook style';
 
   for (let i = 0; i < scenePrompts.length; i++) {
     try {
       console.log(`Generating scene ${i + 1}/${scenePrompts.length}...`);
       
       // Enhance scene prompt with quality keywords
-      const enhancedPrompt = `${scenePrompts[i].prompt}. ${qualityEnhancement}. Maintain exact character appearance from reference.`;
+      const enhancedPrompt = `${scenePrompts[i].prompt}. ${qualityEnhancement}. CRITICAL: Maintain exact character appearance from reference image - same face, same proportions (8-head tall), same sharp features, same style. Character should look identical to reference.`;
       
       const imageUrl = await generateImage({
         prompt: enhancedPrompt,

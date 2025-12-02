@@ -15,21 +15,30 @@ LYRICS:
 ${lyrics}
 
 CRITICAL REQUIREMENTS FOR PROTAGONIST:
-1. Style: Professional 2D illustration (anime/webtoon/character design quality) - NO CARTOON style
-2. Background: Pure white background (#FFFFFF)
-3. Details: Include specific details about:
-   - Facial features (eye color, shape, expression)
-   - Hair style, color, and texture
-   - Clothing style, colors, patterns, accessories
-   - Body type, posture, and pose
-   - Age and personality traits
-   - Unique identifying features
-4. Quality: High-resolution, clean lines, professional character sheet quality
-5. Format: Full body or upper body portrait, front-facing or 3/4 view
+1. Style: Modern anime/webtoon style - HIGH QUALITY animation character design
+   - Think: Netflix anime, Crunchyroll originals, modern Korean webtoon art
+   - NOT children's textbook style, NOT educational material style
+   - Sharp, sophisticated, mature character design
+2. Proportions: REALISTIC ANIME PROPORTIONS (8-head tall, NOT chibi, NOT big-headed)
+   - Adult proportions with mature facial structure
+   - Sharp jawline, defined features, realistic body ratios
+3. Face: Sharp, expressive features
+   - Piercing eyes with intense gaze (almond-shaped, sharp eyeliner)
+   - Strong eyebrows, defined nose, full lips with attitude
+   - Confident, cool, or mysterious expression (NOT cute/innocent)
+4. Hair: Stylish, dynamic hair with flow and volume
+   - Modern cuts with interesting colors/highlights
+   - Hair should have movement and personality
+5. Fashion: Modern, stylish clothing
+   - Urban fashion, streetwear, or edgy style
+   - Detailed accessories and layers
+6. Background: Pure white background (#FFFFFF)
+7. Overall vibe: COOL, CONFIDENT, CHARISMATIC - like a main character from a hit anime series
 
 Please return a JSON object with the following structure:
 {
-  "protagonist_prompt": "EXTREMELY DETAILED character prompt. Must include: specific facial features (eye shape, eye color, nose, mouth), detailed hair description (style, length, color, texture), complete clothing description (type, color, patterns, accessories, shoes), body type, age range, personality visible in pose/expression, artistic style (professional 2D illustration, anime style, clean lines), pure white background. Make this as detailed as possible for consistent character generation.",
+  "protagonist_prompt": "EXTREMELY DETAILED modern anime character with REALISTIC PROPORTIONS (8-head tall adult). MUST include: Sharp facial features with intense eyes (almond-shaped, detailed eyeliner, specific color), strong eyebrows, defined nose and jawline, expressive lips with confident/cool attitude. Dynamic stylish hair (modern cut, interesting color with highlights, flowing movement). Age: 20s-30s with mature, sophisticated appearance. Fashion: Modern urban/streetwear style with detailed clothing layers and accessories. Body: Athletic/lean build with realistic adult proportions (NOT chibi, NOT big-headed). Pose: Confident, dynamic stance showing personality. Art style: High-quality modern anime illustration (Netflix/Crunchyroll quality, NOT textbook style). Pure white background (#FFFFFF). Overall vibe: COOL, CHARISMATIC main character energy.",
+
   "scene_prompts": [
     {
       "scene_number": 1,
@@ -37,16 +46,19 @@ Please return a JSON object with the following structure:
       "description": "Scene description matching the lyrics",
       "camera_angle": "Camera angle (wide shot, close-up, etc.)",
       "lighting": "Lighting description (dramatic, soft, neon, etc.)",
-      "prompt": "DETAILED scene description including: protagonist's specific action and emotion, detailed environment description (location, background elements, atmospheric details), mood and feeling, specific camera angle and framing, lighting direction and quality (golden hour, dramatic shadows, neon glow, etc.), color palette, cinematic composition, visual style (cinematic photography, movie scene quality), ultra detailed, high quality, professional composition."
+      "prompt": "DETAILED anime scene with REALISTIC PROPORTIONS. Protagonist (8-head tall, mature features, sharp eyes, confident expression) performing specific action with strong emotion. Environment: detailed location with atmospheric elements, depth, and scale. Mood: intense and cinematic. Camera: dynamic angle with professional framing. Lighting: dramatic with strong contrast and depth. Art style: High-quality modern anime illustration (anime film/series quality, professional animation frame), detailed shading and highlights, vibrant but sophisticated colors. NOT textbook style, NOT educational illustration. Think: Studio Trigger, MAPPA, Netflix anime quality. Composition: Dynamic, engaging, with strong visual impact."
     },
     ... (30 scenes total)
   ]
 }
 
-IMPORTANT INSTRUCTIONS:
-- Protagonist prompt MUST be EXTREMELY DETAILED (minimum 100 words) with specific physical features
+IMPORTANT INSTRUCTIONS FOR CHARACTER STYLE:
+- Art style: Modern anime/webtoon (high-quality series style, NOT textbook/educational style)
+- Proportions: REALISTIC 8-head tall adults with mature features (NOT chibi, NOT big-headed)
+- Face: Sharp, intense features with strong expressions (cool/confident, NOT cute/innocent)
+- Overall vibe: Main character from a popular anime series - COOL, CHARISMATIC, DYNAMIC
+- Protagonist prompt MUST be EXTREMELY DETAILED (minimum 120 words) with specific physical features
 - Include unique identifying features that make the character memorable and consistent
-- NEVER use cartoon style - use anime, webtoon, or realistic illustration style only
 - Create exactly ${sceneCount} scenes distributed evenly across the song duration
 - Each scene prompt should be highly detailed (minimum 50 words per scene)
 - Scene prompts should include:
