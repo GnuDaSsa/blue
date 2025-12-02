@@ -16,15 +16,15 @@ AI 기술을 활용하여 가사로부터 시네마틱한 뮤직비디오를 자
 - **Frontend**: Next.js 15, React 18, TypeScript
 - **Styling**: Tailwind CSS
 - **AI Services**:
-  - Gemini Pro (LLM for storyboard generation)
-  - Nano Banana Pro (Image generation with character consistency)
+  - Gemini 2.5 Flash (LLM for storyboard generation)
+  - Gemini 2.5 Flash Image (Image generation with character consistency)
+  - **참고**: "Nano Banana Pro"는 Gemini 이미지 생성 기능의 코드명입니다
 
 ## 📋 요구사항
 
 - Node.js 18+ 
 - npm 또는 yarn
-- Gemini API Key
-- Nano Banana API Key
+- Gemini API Key (단일 키로 모든 기능 사용 가능)
 
 ## 🚀 설치 및 실행
 
@@ -58,8 +58,14 @@ vi .env.local
 다음 형식으로 입력:
 ```env
 GEMINI_API_KEY=your_actual_gemini_api_key
-NANOBANANA_API_KEY=your_actual_nanobanana_api_key
 ```
+
+**API 키 발급**: https://aistudio.google.com/app/apikey
+
+이 단일 키로 모든 기능을 사용할 수 있습니다:
+- ✅ LLM 스토리보드 생성
+- ✅ 이미지 생성 (Nano Banana Pro)
+- ✅ 캐릭터 일관성 유지
 
 ⚠️ **보안 주의**: API 키를 절대 채팅이나 공개 장소에 입력하지 마세요!
 
