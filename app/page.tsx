@@ -14,10 +14,11 @@ export default function Home() {
     message: '',
   });
   const [sessionId, setSessionId] = useState<string | null>(null);
-
+  const [lyrics, setLyrics] = useState<string>('');
   const [sceneCount, setSceneCount] = useState(20);
 
-  const handleGenerateStart = async (lyrics: string, selectedSceneCount: number) => {
+  const handleGenerateStart = async (inputLyrics: string, selectedSceneCount: number) => {
+    setLyrics(inputLyrics);
     setSceneCount(selectedSceneCount);
     setGenerationState({
       status: 'generating_story',
@@ -28,7 +29,7 @@ export default function Home() {
       const response = await fetch('/api/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ lyrics, sceneCount: selectedSceneCount }),
+        body: JSON.stringify({ lyrics: inputLyrics, sceneCount: selectedSceneCount }),
       });
 
       if (!response.ok) {
@@ -54,11 +55,62 @@ export default function Home() {
     }
   };
 
-  const handleStoryboardConfirm = async () => {
+  const handleStoryboardRegenerate = async () => {
+    if (!lyrics) return;
+    
+    setGenerationState(prev => ({
+      ...prev,
+      status: 'generating_story',
+      message: 'AI가 스토리보드를 다시 생성하고 있습니다...',
+    }));
+
+    try {
+      const response = await fetch('/api/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ lyrics, sceneCount }),
+      });
+
+      if (!response.ok) {
+        throw new Error('스토리 재생성에 실패했습니다.');
+      }
+
+      const data = await response.json();
+
+      setSessionId(data.sessionId);
+      setGenerationState({
+        status: 'storyboard_review',
+        message: '스토리보드를 검토해주세요',
+        storyboard: data.storyboard,
+      });
+    } catch (error) {
+      setGenerationState({
+        status: 'error',
+        message: '오류가 발생했습니다. 다시 시도해주세요.',
+        error: error instanceof Error ? error.message : '알 수 없는 오류',
+      });
+    }
+  };
+
+  const handleStoryboardConfirm = async (editedStoryboard?: LLMResponse) => {
+    // If storyboard was edited, update session with new data
+    if (editedStoryboard && sessionId) {
+      try {
+        await fetch('/api/update-storyboard', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ sessionId, storyboard: editedStoryboard }),
+        });
+      } catch (error) {
+        console.warn('Failed to update storyboard in session:', error);
+      }
+    }
+
     setGenerationState(prev => ({
       ...prev,
       status: 'generating_story',
       message: '주인공 후보 4개를 생성하고 있습니다... (약 10초 소요)',
+      storyboard: editedStoryboard || prev.storyboard,
     }));
 
     try {
@@ -245,6 +297,7 @@ export default function Home() {
             storyboard={generationState.storyboard}
             onConfirm={handleStoryboardConfirm}
             onBack={handleReset}
+            onRegenerate={handleStoryboardRegenerate}
           />
         )}
 
