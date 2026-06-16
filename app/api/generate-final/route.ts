@@ -15,6 +15,13 @@ export async function POST(request: NextRequest) {
         let scenePrompts;
         if (sessionId && sessionStore.has(sessionId)) {
           const sessionData = sessionStore.get(sessionId);
+          if (!sessionData) {
+            controller.enqueue(
+              encoder.encode(`data: ${JSON.stringify({ error: 'Session expired or not found' })}\n\n`)
+            );
+            controller.close();
+            return;
+          }
           scenePrompts = sessionData.storyboard.scene_prompts;
         } else {
           // Fallback: use a default or return error

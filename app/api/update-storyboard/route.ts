@@ -23,6 +23,13 @@ export async function POST(request: NextRequest) {
 
     // Update session with edited storyboard
     const existingSession = sessionStore.get(sessionId);
+    if (!existingSession) {
+      return NextResponse.json(
+        { error: 'Session not found' },
+        { status: 404 }
+      );
+    }
+
     sessionStore.set(sessionId, {
       ...existingSession,
       storyboard: storyboard,

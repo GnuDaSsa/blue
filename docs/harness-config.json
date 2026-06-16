@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "paths": {
+    "stateFile": "docs/harness-state.json",
+    "memoryFile": "docs/project-memory.md",
+    "decisionsFile": "docs/decisions.md",
+    "contractsDir": "docs/contracts"
+  },
+  "commands": {
+    "verifyQuick": "python3 -m py_compile video-team/codex-video-runtime/scripts/*.py && npm run build",
+    "verifyFull": "python3 -m py_compile video-team/codex-video-runtime/scripts/*.py && npm run build",
+    "docsGenerate": ""
+  },
+  "rules": {
+    "maxRepeatedFailures": 2
+  }
+}

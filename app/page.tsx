@@ -6,7 +6,7 @@ import StoryboardReview from '@/components/StoryboardReview';
 import ProtagonistSelector from '@/components/ProtagonistSelector';
 import ImageGallery from '@/components/ImageGallery';
 import LoadingSpinner from '@/components/LoadingSpinner';
-import type { GenerationState, ProtagonistImage } from '@/types';
+import type { GenerationState, LLMResponse, ProtagonistImage } from '@/types';
 
 export default function Home() {
   const [generationState, setGenerationState] = useState<GenerationState>({
