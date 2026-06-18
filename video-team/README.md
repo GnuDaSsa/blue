@@ -13,6 +13,7 @@ This folder preserves the reusable parts of the user's Codex/Hermes video-team s
   - `music-director`
   - `jeongseon-video-typography`
 - `wiki-extract/` — curated workflow/seed/QC knowledge exported from the local LLM wiki.
+- `wiki-extract/jinuwiki/` — current full public-safe snapshot of the local `jinuwiki` knowledge base, excluding editor metadata such as `.obsidian/`.
 
 ## Excluded intentionally
 
